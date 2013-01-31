@@ -7,27 +7,37 @@
 var w = 500;
 var h = 100;
 
-var data;
+var dataset;
 
-jQuery.getJSON("http://biodiversity.org.au/apni.name/28354.json?callback=?", function(error, json){
-  //if (error) return console.warn(error);
-  data = json;
-  alert(data[0]);
+jQuery.getJSON("taxon.json", function(json, status){
+  dataset = json[0];
+  console.log(dataset);
   visualizeit();
-	console.log("hello");
-
-	
 });
 
 function visualizeit(){
-  				
-	var svg = d3.select("body").append("svg");
-	svg.attr("width", w)
-	   .attr("height", h);
 
-    svg.data(data[0]).selectAll("div")
-	.enter().append("div")
-	.text(function(d){ return "Helllllo";});	   
+	links = dataset.LinksTo;
+
+	d3.select("body").selectAll("p")
+    .data(links)
+    .enter()
+    .append("p")
+    .text(function(d){
+		ret = "?";
+		title ="";
+		if(d.TaxonConceptRef){
+			title = d.TaxonConceptRef.dcterms_title;
+		}
+		else if(d.TaxonNameRef){
+			title = d.TaxonNameRef.dcterms_title;
+		}
+		if (d.LinkTo) {
+			ret = d.LinkTo["link-type"] + " " + title;
+		}
+		
+		return ret;
+	});	   
 	   
 }
 
