@@ -7,8 +7,8 @@
 var width = Math.max( $(window).width() * 0.95, 960 ),  //width
     height = Math.max( $(window).height() * 0.95, 600 ); //height	
 	
-var charge = -80;
-var gravity = 0.05;
+var charge = -100;
+var gravity = .04;
 var distance = height / 2.5;
 var circ_size = 10;	
 
@@ -23,7 +23,7 @@ var force = d3.layout.force()
 	.charge(charge)
 	.gravity(gravity)
 	.linkDistance(distance)
-    .size([width-100, height]);	
+    .size([width-350, height-100]);	
 
 var dataset;
 var nodesByName = {}; 
