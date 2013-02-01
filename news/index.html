@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+text {
+  font: 10px sans-serif;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var w = Math.max( window.innerWidth * 0.95, 960 ),  //width
+    h = Math.max( window.innerHeight * 0.95, 600 ); //height
+
+var format = d3.format(",d"),
+    color = d3.scale.category20c(),
+	charge = -50,
+	gravity = 0.05,
+	padding = 6;
+
+var radius, max_amount;	
+	
+var force = d3.layout.force()
+					 .gravity(gravity)
+					//.charge(function(d, i) { return i ? -20 : -2000; })
+					.charge(charge)
+					 .size([w,h])
+					 ;	
+
+var svg = d3.select("body").append("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+	 function charge(d){
+		return -Math.pow(d.radius, 2.0) / 8 ;
+	}	
+	
+d3.json("news.json", function(error, data) {
+
+
+  var nodes = d3.values(data);
+  nodes.forEach(function(n){
+	n.x =  Math.random() * 900;
+    n.y = Math.random() * 800;
+  });
+  
+  // use the max total_amount in the data as the max in the scale's domain
+    max_amount = d3.max(nodes,function(d) { return parseInt(d.number); });
+    radius = d3.scale.pow().exponent(0.5).domain([0, max_amount]).range([2, 85]);
+  
+
+  
+  var g = svg.selectAll(".node")
+      .data(nodes)
+      .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + ","+ d.y + ")"; })
+	  ;
+
+  g.append("title")
+      .text(function(d) { return d.subject; });
+
+  g.append("circle")
+      .attr("r", function(d) { return +d.number *10; })
+      .style("fill", function(d) { return color(d.subject); }).call(force.drag);
+
+  g.append("text")
+      .attr("dy", ".3em")
+      .style("text-anchor", "middle")
+      .text(function(d) { return d.subject; });
+  
+
+	    // Start the force layout.
+  force.nodes(nodes)
+	   .on("tick", tick)
+       .start();
+	   
+
+	   
+  function tick() {
+
+	  var q = d3.geom.quadtree(nodes),
+		  i = 0,
+		  n = nodes.length;
+
+	  while (++i < n) {
+		q.visit(collide(nodes[i]));
+	  }
+
+	  //g.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+	  svg.selectAll("g")
+	  .each(collide(0.5))
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  }
+  
+	// Resolves collisions between d and all other circles.
+	function collide(alpha) {
+	  var quadtree = d3.geom.quadtree(nodes);
+	  return function(d) {
+		var r = d.number + radius.domain()[1] + padding,
+			nx1 = d.x - r,
+			nx2 = d.x + r,
+			ny1 = d.y - r,
+			ny2 = d.y + r;
+		quadtree.visit(function(quad, x1, y1, x2, y2) {
+		  if (quad.point && (quad.point !== d)) {
+			var x = d.x - quad.point.x,
+				y = d.y - quad.point.y,
+				l = Math.sqrt(x * x + y * y),
+				r = d.number + quad.point.number + (d.color !== quad.point.color) * padding;
+			if (l < r) {
+			  l = (l - r) / l * alpha;
+			  d.x -= x *= l;
+			  d.y -= y *= l;
+			  quad.point.x += x;
+			  quad.point.y += y;
+			}
+		  }
+		  return x1 > nx2
+			  || x2 < nx1
+			  || y1 > ny2
+			  || y2 < ny1;
+		});
+	  };
+	}
+
+	  
+});
+
+
+
+</script>
