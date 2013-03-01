@@ -27,13 +27,15 @@ var svg = d3.select("body").append("svg")
 
 d3.json("topic.json", function(error, root) {
   var node = svg.selectAll(".node")
-      .data(bubble.nodes(clean(root)))
+  
+      .data(bubble.nodes(clean(root))
+	  .filter(function(d) { return !d.children; }))
       .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   node.append("title")
-      .text(function(d) { return d.tag + ": " + format(d.value); });
+      .text(function(d) { return d.tag + ": " + format(d.value) + " : " + d.party; });
 
   node.append("circle")
       .attr("r", function(d) { return d.value; })
@@ -57,10 +59,15 @@ function clean(result){
 		  var n = result[key].number;
 		  var t = result[key].value;
 		  
-		  classes.push({party: p, tag: t, value: n});
+		  if (p.length && n.length && t.length){
+			classes.push({party: p, tag: t, value: n});
+		  }
 	   }
 	}
+	console.log(classes);
 	return {children: classes};
+	
+	
 }
 
 
