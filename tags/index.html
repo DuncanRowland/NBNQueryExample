@@ -13,7 +13,13 @@ text {
 
 var diameter = 960,
     format = d3.format(",d"),
-    color = d3.scale.category20c();
+    //color = d3.scale.category20c();
+	// set the colours according to the party
+	color = d3.scale.ordinal()
+    .domain(["ALP", "Liberal", "National", "Greens"])
+    .range(["#BF3030","#4380D3","#FFCA73", "269926"]);
+
+
 
 var bubble = d3.layout.pack()
     .sort(null)
@@ -25,7 +31,10 @@ var svg = d3.select("body").append("svg")
     .attr("height", diameter)
     .attr("class", "bubble");
 
-d3.json("topic.json", function(error, root) {
+d3.json("city.json", function(error, root) {
+
+
+
   var node = svg.selectAll(".node")
   
       .data(bubble.nodes(clean(root))
@@ -38,7 +47,7 @@ d3.json("topic.json", function(error, root) {
       .text(function(d) { return d.tag + ": " + format(d.value) + " : " + d.party; });
 
   node.append("circle")
-      .attr("r", function(d) { return d.value; })
+      .attr("r", function(d) { return d.r; })
       .style("fill", function(d) { return color(d.party); });
 
   node.append("text")
