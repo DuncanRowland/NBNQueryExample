@@ -8,7 +8,14 @@ text {
 
 </style>
 <body>
+
 <script src="http://d3js.org/d3.v3.min.js"></script>
+  <label><input type="radio" name="mode" value="party" checked> Party</label>
+  <label><input type="radio" name="mode" value="tag"> Topic</label>
+  <label><input type="radio" name="mode" value="value"> Count</label>
+</form>
+
+
 <script>
 
 var diameter = 960,
@@ -17,27 +24,24 @@ var diameter = 960,
 	// set the colours according to the party
 	color = d3.scale.ordinal()
     .domain(["ALP", "Liberal", "National", "Greens"])
-    .range(["#BF3030","#4380D3","#FFCA73", "269926"]);
+    .range(["#BF3030","#4380D3","#FFCA73", "#269926"]);
 
 
 
 var bubble = d3.layout.pack()
-    .sort(null)
+	.sort(function(a,b){ return d3.ascending(a["party"],b["party"]); })
     .size([diameter, diameter])
-    .padding(1.5);
+	.padding(2);	
 
 var svg = d3.select("body").append("svg")
     .attr("width", diameter)
     .attr("height", diameter)
     .attr("class", "bubble");
-
+	
+function drawChart(){	
 d3.json("city.json", function(error, root) {
 
-
-
-  var node = svg.selectAll(".node")
-  
-      .data(bubble.nodes(clean(root))
+  var node = svg.selectAll(".node").data(bubble.nodes(clean(root))
 	  .filter(function(d) { return !d.children; }))
       .enter().append("g")
       .attr("class", "node")
@@ -54,7 +58,32 @@ d3.json("city.json", function(error, root) {
       .attr("dy", ".3em")
       .style("text-anchor", "middle")
       .text(function(d) { return d.tag.substring(0, d.r / 3); });
+	  
+
+
+   d3.selectAll("input").on("change", function(){
+		value = this.value;
+		
+        bubble = d3.layout.pack()
+	         .size([diameter, diameter])
+			 .sort(function(a,b){ return d3.descending(a[value],b[value]); })
+			 .padding(2);
+	
+		node.data(bubble.nodes(clean(root))
+			.filter(function(d) { return !d.children; })
+		)
+	.transition()
+	.duration(1500)
+	.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+	});	
+
+	  
 });
+
+ 
+
+}
+
 
 function clean(result){
 	var classes = [];
@@ -81,5 +110,6 @@ function clean(result){
 
 
 d3.select(self.frameElement).style("height", diameter + "px");
+drawChart();
 
 </script>
