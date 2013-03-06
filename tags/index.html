@@ -61,15 +61,16 @@ d3.json("city.json", function(error, root) {
       .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-
-  node.append("title")
-      .text(function(d) { return d.tag + ": " + format(d.value) + " : " + d.party; });
-
-  node.append("circle")
+  
+  node.append("title").text(function(d) { return d.tag + " (" + d.party + ": " + d.value + ")"; });	  
+  
+  node.append("a").attr("xlink:href", function(d) { return buildURL(d.tag); })
+	  .append("circle")
       .attr("r", function(d) { return d.r; })
       .style("fill", function(d) { return color(d.party); });
 
-  node.append("text")
+  node.append("a").attr("xlink:href", function(d) { return buildURL(d.tag); })
+	  .append("text")
       .attr("dy", ".3em")
       .style("text-anchor", "middle")
       .text(function(d) { return d.tag.substring(0, d.r / 3); });
@@ -96,9 +97,6 @@ d3.json("city.json", function(error, root) {
 
 	  
 });
-
- 
-
 }
 
 
@@ -125,6 +123,9 @@ function clean(result){
 	
 }
 
+function buildURL(tag, party, datefrom, dateto){
+	return "http://library.parliament.vic.gov.au";
+}
 
 d3.select(self.frameElement).style("height", diameter + "px");
 drawChart();
