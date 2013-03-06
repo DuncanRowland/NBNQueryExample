@@ -18,7 +18,7 @@ text {
 
 <script>
 
-var diameter = 960,
+var diameter = 750,
     format = d3.format(",d"),
     //color = d3.scale.category20c();
 	// set the colours according to the party
@@ -29,7 +29,7 @@ var diameter = 960,
 
 
 var bubble = d3.layout.pack()
-	.sort(function(a,b){ return d3.ascending(a["party"],b["party"]); })
+	.sort(function(a,b){ return d3.descending(a["party"],b["party"]); })
     .size([diameter, diameter])
 	.padding(2);	
 
@@ -64,14 +64,16 @@ d3.json("city.json", function(error, root) {
    d3.selectAll("input").on("change", function(){
 		value = this.value;
 		
-        bubble = d3.layout.pack()
+        var bubble = d3.layout.pack()
 	         .size([diameter, diameter])
 			 .sort(function(a,b){ return d3.descending(a[value],b[value]); })
 			 .padding(2);
 	
 		node.data(bubble.nodes(clean(root))
 			.filter(function(d) { return !d.children; })
-		)
+		).enter();
+
+	node	
 	.transition()
 	.duration(1500)
 	.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
