@@ -2,14 +2,27 @@
 <meta charset="utf-8">
 <style>
 
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
 text {
   font: 10px sans-serif;
+}
+form {
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }
 
 </style>
 <body>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<form>
   <label><input type="radio" name="mode" value="party" checked> Party</label>
   <label><input type="radio" name="mode" value="tag"> Topic</label>
   <label><input type="radio" name="mode" value="value"> Count</label>
@@ -18,24 +31,26 @@ text {
 
 <script>
 
-var diameter = 750,
+var diameter = 950,
     format = d3.format(",d"),
     //color = d3.scale.category20c();
 	// set the colours according to the party
 	color = d3.scale.ordinal()
     .domain(["ALP", "Liberal", "National", "Greens"])
     .range(["#BF3030","#4380D3","#FFCA73", "#269926"]);
+	
+var width = diameter, height = diameter - 300;	
 
 
 
 var bubble = d3.layout.pack()
 	.sort(function(a,b){ return d3.descending(a["party"],b["party"]); })
-    .size([diameter, diameter])
+    .size([width, height])
 	.padding(2);	
 
 var svg = d3.select("body").append("svg")
-    .attr("width", diameter)
-    .attr("height", diameter)
+    .attr("width", width)
+    .attr("height", height)
     .attr("class", "bubble");
 	
 function drawChart(){	
@@ -65,7 +80,7 @@ d3.json("city.json", function(error, root) {
 		value = this.value;
 		
         var bubble = d3.layout.pack()
-	         .size([diameter, diameter])
+	         .size([width, height])
 			 .sort(function(a,b){ return d3.descending(a[value],b[value]); })
 			 .padding(2);
 	
