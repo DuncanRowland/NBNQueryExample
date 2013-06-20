@@ -16,16 +16,10 @@ var chart = d3.select("#viz").append("svg:svg")
     .attr("width", width)
     .attr("height", height)
     .attr("class", "bubble");
-	
-d3.select("#searchtaxon").on("change", function(){
-	
-	doChart(this.value);
-	
-}	);
 
 function doChart(tax){
 	
-d3.jsonp("http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&callback={callback}&q=family:Rutaceae"  , function(json){	
+d3.jsonp("http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&callback={callback}&q=family:" + tax  , function(json){	
 
 res = json.facetResults[0].fieldResult;	
 stuff = clean(res);
@@ -75,6 +69,9 @@ function buildURL(tax, other){
         var url = "http://google.com?q="+tax;
         return url;
 }
+
+
+doChart("Rutaceae");
 
  
    
