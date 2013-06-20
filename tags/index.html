@@ -14,24 +14,71 @@ text {
 }
 form {
   position: absolute;
-  right: 10px;
-  top: 10px;
+  right: 0;
+  top: 30px;
+  width: 960px;
 }
+
+svg { clear:none; float: left; }
+
+.searchgroup { margin-right: 50px; }
+
+#legend { 
+  float: right;
+  clear: none;
+  width: 150px; 
+}
+#legend div { padding: 3px; }
+.alp { background-color: #BF3030; }
+.liberal { background-color: #4380D3; }
+.national { background-color: #FFCA73; }
+.green { background-color: #269926; }
 
 </style>
 <body>
+<h2>Explore recent Media Releases</h2>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<div id="legend">
+         Source of Media Release
+	<div class="alp">ALP</div>
+	<div class="liberal">Liberal</div>
+	<div class="national">National</div>
+	<div class="green">Green</div>
+</div>
+<div id="viz"></div>
+
 <form>
-  <label><input type="radio" name="mode" value="party" checked> Party</label>
-  <label><input type="radio" name="mode" value="tag"> Topic</label>
-  <label><input type="radio" name="mode" value="value"> Count</label>
+  <span class="searchgroup">
+  Show: 
+  <select id="cat" name="category">
+	<option value="person">People</option>
+	<option value="city">Places</option>
+	<option value="topic">Topics</option>
+  </select>
+  mentioned: 
+  <select id="timeframe" name="timeframe">
+	<option value="7">Last Week</option>
+	<option value="30">Last 30 days</option>
+	<option value="183">Last 6 months</option>
+	<option value="365">Last Year</option>
+  </select>
+  </span>
+  <span class="searchgroup">
+  Group by:
+  <label><input type="radio" name="mode" value="party"> Party</label>
+  <label><input type="radio" name="mode" value="tag"> Person/Place/Topic</label>
+  <label><input type="radio" name="mode" value="value" checked> Number</label>
+  </span>
 </form>
 
 
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
 <script>
 
-var diameter = 950,
+// TO DO: call json dynamically
+
+var diameter = 800,
     format = d3.format(",d"),
     //color = d3.scale.category20c();
 	// set the colours according to the party
@@ -39,22 +86,36 @@ var diameter = 950,
     .domain(["ALP", "Liberal", "National", "Greens"])
     .range(["#BF3030","#4380D3","#FFCA73", "#269926"]);
 	
-var width = diameter, height = diameter - 300;	
-
+var width = diameter, height = (diameter - 100);	
 
 
 var bubble = d3.layout.pack()
-	.sort(function(a,b){ return d3.descending(a["party"],b["party"]); })
+	.sort(function(a,b){ return d3.descending(a["value"],b["value"]); })
     .size([width, height])
 	.padding(2);	
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#viz").append("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("class", "bubble");
 	
 function drawChart(){	
-d3.json("city.json", function(error, root) {
+
+var url = "../partytags.php";
+var dropdown = d3.select("#cat");
+url = url + "?cat=" + dropdown.node().options[dropdown.node().selectedIndex].value;
+
+var timeframe = d3.select("#timeframe");
+var chosen_timeframe = timeframe.node().options[timeframe.node().selectedIndex].value;
+var to = new Date();
+var from = new Date(new Date(to).setDate(to.getDate() - chosen_timeframe));
+ console.log(printDate(to) + " : " + printDate(from));
+
+url += "&datefrom=" + printDate(from) + "&dateto=" + printDate(to)
+
+console.log(url);
+
+d3.json(url, function(error, root) {
 
   var node = svg.selectAll(".node").data(bubble.nodes(clean(root))
 	  .filter(function(d) { return !d.children; }))
@@ -64,21 +125,20 @@ d3.json("city.json", function(error, root) {
   
   node.append("title").text(function(d) { return d.tag + " (" + d.party + ": " + d.value + ")"; });	  
   
-  node.append("a").attr("xlink:href", function(d) { return buildURL(d.tag); })
+  node.append("a").attr("xlink:href", function(d) { return buildURL(d.tag, d.party); })
 	  .append("circle")
       .attr("r", function(d) { return d.r; })
+      .style("stroke", "#aaa")
       .style("fill", function(d) { return color(d.party); });
 
-  node.append("a").attr("xlink:href", function(d) { return buildURL(d.tag); })
+  node.append("a").attr("xlink:href", function(d) { return buildURL(d.tag, d.party); })
 	  .append("text")
       .attr("dy", ".3em")
       .style("text-anchor", "middle")
       .text(function(d) { return d.tag.substring(0, d.r / 3); });
-	  
-
 
    d3.selectAll("input").on("change", function(){
-		value = this.value;
+	value = this.value;
 		
         var bubble = d3.layout.pack()
 	         .size([width, height])
@@ -99,7 +159,6 @@ d3.json("city.json", function(error, root) {
 });
 }
 
-
 function clean(result){
 	var classes = [];
 	for (var key in result)
@@ -119,15 +178,57 @@ function clean(result){
 	}
 	console.log(classes);
 	return {children: classes};
-	
-	
 }
 
 function buildURL(tag, party, datefrom, dateto){
-	return "http://library.parliament.vic.gov.au";
+	// TO DO
+	var url = "http://library.parliament.vic.gov.au/dbtw-wpd/exec/dbtwpub.dll";
+	url +=    "?TN=allmediarelease&QY=find%20(Party%20ct%20[Party])%20and%20(sem_tags%20ct%20[Tag])".replace("[Party]", party).replace("[Tag]", tag);
+        url +=    "&RF=intranet_desc_date&DF=intranet_single_rec&BU=http%3A%2F%2Flibrary.parliament.vic.gov.au%2Fdatabase%2Fmediarelease%2Fallmr.shtml";
+        url +=    "&MR=50&NP=1&AC=QBE_QUERY&XC=%2Fdbtw-wpd%2Fexec%2Fdbtwpub.dll";
+	return url;
 }
 
 d3.select(self.frameElement).style("height", diameter + "px");
+
+// draw the scale
+legend = d3.select("#viz").append("div");
+
+
+var cat_dropdown = d3.select("#cat");
+cat_dropdown.on("change", function (){
+	svg.remove();
+	svg=d3.select("#viz").append("svg")
+    			     .attr("width", width)
+    			     .attr("height", height)
+    			     .attr("class", "bubble");
+	drawChart();	
+});
+
+var date_dropdown = d3.select("#timeframe");
+date_dropdown.on("change", function (){
+	svg.remove();
+	svg=d3.select("#viz").append("svg")
+    			     .attr("width", width)
+    			     .attr("height", height)
+    			     .attr("class", "bubble");
+
+	drawChart();	
+});
+
 drawChart();
+
+function printDate(d) {
+    var dateStr = padStr(d.getFullYear()) + "-" + 
+                  padStr(1 + d.getMonth()) + "-" +
+                  padStr(d.getDate());
+    return dateStr;
+}
+
+function padStr(i) {
+    return (i < 10) ? "0" + i : "" + i;
+}
+
+
 
 </script>
