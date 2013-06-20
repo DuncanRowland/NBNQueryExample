@@ -13,6 +13,7 @@
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
+	  text { font: 12px sans-serif; }
     </style>
     <link href="./bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -48,7 +49,7 @@
             </ul>
           </div><!--/.nav-collapse -->
 		  <form class="navbar-search pull-left">
-			<input type="text" class="search-query" placeholder="Search">
+			<input type="text" id="searchtaxon" class="search-query" placeholder="Search">
 		  </form>
         </div>
       </div>
@@ -79,6 +80,7 @@
     <script src="./bootstrap/js/bootstrap-carousel.js"></script>
     <script src="./bootstrap/js/bootstrap-typeahead.js"></script>
 			    <script src="http://d3js.org/d3.v3.min.js"></script>
+				<script src="jsonp.js"></script>
 				<script src="app.js"></script>
 
   </body>

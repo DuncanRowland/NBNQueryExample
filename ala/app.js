@@ -1,13 +1,5 @@
 
 
-//Width and height
-var stuff = { children:[
-    {taxon:"TVI",  label:"aa", value:2000},
-    {taxon:"Boronia",  label:"aa", value:1520},
-    {taxon:"RTP1", label:"bb", value: 800},
-    {taxon:"RTP2", label:"bb", value: 150}
-]};
-
 var width = 1100,
 	height = 800,
     format = d3.format(",d"),
@@ -20,13 +12,20 @@ var bubble = d3.layout.pack()
 
 	
  
-var chart = d3.select("body").append("svg:svg")
+var chart = d3.select("#viz").append("svg:svg")
     .attr("width", width)
     .attr("height", height)
     .attr("class", "bubble");
-
 	
-d3.json("taxon.json", function(json){	
+d3.select("#searchtaxon").on("change", function(){
+	
+	doChart(this.value);
+	
+}	);
+
+function doChart(tax){
+	
+d3.jsonp("http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&callback={callback}&q=family:Rutaceae"  , function(json){	
 
 res = json.facetResults[0].fieldResult;	
 stuff = clean(res);
@@ -47,9 +46,9 @@ node.append("svg:text")
     .attr("text-anchor", "middle")
     .attr("dy", ".3em")
     .text(function(d) { console.log(d); return d.taxon.substring(0, d.r/3); });
-
-	
 });
+
+}
 function clean(result){
         var classes = [];
         for (var key in result)
