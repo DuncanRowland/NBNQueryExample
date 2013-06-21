@@ -44,7 +44,8 @@
           <a class="brand" href="#">Atlas of Living Australia Viz</a>
           <div class="nav-collapse collapse">
              <form class="navbar-search pull-left">
-			<input type="text" id="searchfield" class="search-query" placeholder="search for a name" autocomplete="off">
+			<input type="text" id="searchvalue" class="search-query" placeholder="search for a name" autocomplete="off">
+			<input type="hidden" id="searchtype" value="*">
 		  </form>
 
           </div><!--/.nav-collapse -->
@@ -60,18 +61,18 @@
 		
 		<div id="facet" class="span2">
 			  <h4>View by:</h3>
-			  <a class="btn btn-primary btn-block" href="">Occurrence Number</a><br>
-			  <a class="btn btn-block" href="">Collector</a><br>
+			  <a class="btn btn-primary btn-block" href="">Occurrence Number</a>
+			  <a class="btn btn-block" href="">Collector</a>
 			  <a class="btn btn-block" href="">Genus</a>
-			  <a class="btn btn-block" href="">Collector</a><br>
-			  <a class="btn btn-block" href="">Genus</a>
-			  <a class="btn btn-block" href="">Collector</a><br>
-			  <a class="btn btn-block" href="">Genus</a>
+			  <a class="btn btn-block" href="">State</a>
+			  <a class="btn btn-block" href="">Endangered status</a>
 		
 		</div>
 		<div class="navbar navbar-fixed-bottom" id="footer">
-			<p class="muted credit pull-right">Made by <a href="http://twitter.com/peterneish">@peterneish</a>, 
-			Data from the <a href="http://www.ala.org.au">Atlas of Liviing Australia</a></p>
+			<p class="muted credit pull-right">Interface by <a href="http://twitter.com/peterneish">@peterneish</a>,
+			data from the <a href="http://www.ala.org.au">Atlas of Liviing Australia</a>, code on <a href="https://github.com/peterneish/d3/tree/master/ala">GitHub</a>.
+			</p>
+			
 		</div>
     </div>
 

@@ -24,50 +24,100 @@ var chart = d3.select("svg")
 
 
 $(document).ready(function() {
-    $("#searchfield").typeahead({
+var rows, mapped;
+    $("#searchvalue").typeahead({
         minLength: 3,
+		items: 20,
         source: function(query, process) {
-            $.getJSON('http://bie.ala.org.au/search/auto.jsonp?callback=?', { q: query, limit: 10 }, function(data) {
-				var rows = new Array();
-				data = data.autoCompleteList;
-				for(var i=0; i<data.length; i++){
-					rows[i] = data[i].matchedNames[0];
-				}
-
+            $.getJSON('http://bie.ala.org.au/search/auto.jsonp?callback=?', { q: query, limit: 100, idxType: "TAXON", geoOnly: "true"}, function(data) {
+			
+				rows = new Array();
+				mapped = {};
+				$.each(data.autoCompleteList, function(i, name){
+					var query_label = name.matchedNames[0];
+					mapped[query_label] = {rankString: name.rankString, guid: name.guid};
+					
+					rows.push(query_label);
+				});
+				//data = data.autoCompleteList;
+				//for(var i=0; i<data.length; i++){
+				//	rows[i] = data[i].matchedNames[0];
+				//}
                 process(rows);
-
             });
-        }
+        },
+		updater: function(query_label){
+			var rankString = mapped[query_label].rankString;
+			$("#searchtype").val(rankString);
+			
+			console.log(rankString + ":" + query_label + ":" + mapped[query_label].guid);
+			
+			doChart(mapped[query_label].guid);
+						
+			return query_label;			
+		}
     });
-	doChart("Rutaceae");
+
 });
 	
 
-function doChart(tax){
-	
-//d3.jsonp("http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=collector&callback={callback}&q=family:" + tax  , function(json){	
-d3.json("taxon.json", function(json){
 
-res = json.facetResults[0].fieldResult;	
-stuff = clean(res);
-var node = chart.selectAll("g.node")
-    .data(bubble.nodes(stuff))
-    .enter().append("svg:g")
-        .attr("class", "node")
-        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
- 
-node.append("svg:title")
-    .text(function(d) { return d.taxon + ": " + format(d.value); });
- 
-node.append("svg:circle")
-    .attr("r", function(d) { return d.r; })
-    .style("fill", function(d) { return d.children ? "#fff" : fill(d.taxon); });
- 
-node.append("svg:text")
-    .attr("text-anchor", "middle")
-    .attr("dy", ".3em")
-    .text(function(d) {  return d.taxon.substring(0, d.r/3); });
-});
+function doChart(query, facet){
+
+	var url;
+
+	if( (/^urn:/i).test(query) ){
+		query = 'lsid:"' + query + '"';
+	}
+
+	url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=collector&callback={callback}&q=" + query;
+		
+	d3.jsonp( url , function(json){	
+	//d3.json("taxon.json", function(json){
+		
+		// remove old nodes if there are some
+		var nodeStringLenth = d3.selectAll("g.node").toString().length; 
+		if ( nodeStringLenth > 0) {
+			d3.selectAll("g.node")
+				.remove();
+		}
+
+		res = json.facetResults[0].fieldResult;	
+		stuff = clean(res);
+		console.log(stuff);
+		var node = chart.selectAll("g.node")
+			.data(bubble.nodes(stuff));
+			
+		node.enter().append("svg:g")
+				.attr("class", "node")
+				.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+		
+		node.attr("r", function(d) { return d.r });		
+				
+		node.append("svg:title")
+			.text(function(d) { return d.taxon + ": " + format(d.value); });
+		 
+		node.append("svg:circle")
+			.attr("r", function(d) { return d.r; })
+			.style("fill", function(d) { return d.children ? "#fff" : fill(d.taxon); });
+		 
+		node.append("svg:text")
+			.attr("text-anchor", "middle")
+			.attr("dy", ".3em")
+			.text(function(d) {  return d.taxon.substring(0, d.r/3); });
+			
+			console.log(node);
+			node.exit().remove();
+		
+		
+	});
+	
+	
+
+}
+
+function updateView(view){
+// changes the chart view to something else
 
 }
 function clean(result){
@@ -80,6 +130,7 @@ function clean(result){
                   // here you have access to
                   var tax = result[key].label;
 				  var num = result[key].count;
+				  
                   if (tax.length && num){
                         classes.push({taxon: tax, value: num});
                   }
@@ -97,13 +148,6 @@ function buildURL(tax, other){
         return url;
 }
 
-function updateWindow(){
-    x = w.innerWidth || e.clientWidth || g.clientWidth;
-    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
-
-    chart.attr("width", x).attr("height", y);
-}
-window.onresize = updateWindow;
 
 
 
