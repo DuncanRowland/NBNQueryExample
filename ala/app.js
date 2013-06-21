@@ -2,12 +2,12 @@
 var w = window,
     d = document,
     e = d.documentElement,
-    g = d.getElementById("container"),
-    x = w.innerWidth || e.clientWidth || g.clientWidth,
-    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+    g = d.getElementById("viz"),
+    x = g.clientWidth || w.innerWidth || e.clientWidth,
+    y = w.innerHeight|| e.clientHeight || g.clientHeight;
 
-var width = Math.max( x * 0.85, 400 ),  //width
-    height = Math.max( y * 0.85, 300 ), //height
+var width = Math.max( x * 0.9, 400 ),  //width
+    height = Math.max( y * 0.9, 300 ), //height
     format = d3.format(",d"),
     fill = d3.scale.category20c();
 
@@ -17,7 +17,7 @@ var bubble = d3.layout.pack()
 	.padding(5);
 
  
-var chart = d3.select("#viz").append("svg:svg")
+var chart = d3.select("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("class", "bubble");
