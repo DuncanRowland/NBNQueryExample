@@ -1,7 +1,13 @@
+// calculate window size
+var w = window,
+    d = document,
+    e = d.documentElement,
+    g = d.getElementById("container"),
+    x = w.innerWidth || e.clientWidth || g.clientWidth,
+    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-
-var width = 1100,
-	height = 800,
+var width = Math.max( x * 0.85, 400 ),  //width
+    height = Math.max( y * 0.85, 300 ), //height
     format = d3.format(",d"),
     fill = d3.scale.category20c();
 
@@ -10,16 +16,37 @@ var bubble = d3.layout.pack()
     .size([width, height])
 	.padding(5);
 
-	
  
 var chart = d3.select("#viz").append("svg:svg")
     .attr("width", width)
     .attr("height", height)
     .attr("class", "bubble");
 
+
+$(document).ready(function() {
+    $("#searchfield").typeahead({
+        minLength: 3,
+        source: function(query, process) {
+            $.getJSON('http://bie.ala.org.au/search/auto.jsonp?callback=?', { q: query, limit: 10 }, function(data) {
+				var rows = new Array();
+				data = data.autoCompleteList;
+				for(var i=0; i<data.length; i++){
+					rows[i] = data[i].matchedNames[0];
+				}
+
+                process(rows);
+
+            });
+        }
+    });
+	doChart("Rutaceae");
+});
+	
+
 function doChart(tax){
 	
-d3.jsonp("http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&callback={callback}&q=family:" + tax  , function(json){	
+//d3.jsonp("http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=collector&callback={callback}&q=family:" + tax  , function(json){	
+d3.json("taxon.json", function(json){
 
 res = json.facetResults[0].fieldResult;	
 stuff = clean(res);
@@ -39,7 +66,7 @@ node.append("svg:circle")
 node.append("svg:text")
     .attr("text-anchor", "middle")
     .attr("dy", ".3em")
-    .text(function(d) { console.log(d); return d.taxon.substring(0, d.r/3); });
+    .text(function(d) {  return d.taxon.substring(0, d.r/3); });
 });
 
 }
@@ -58,7 +85,7 @@ function clean(result){
                   }
            }
         }
-		console.log({children: classes});
+		//
         return {taxon: "", children: classes};
 
 }
@@ -70,8 +97,16 @@ function buildURL(tax, other){
         return url;
 }
 
+function updateWindow(){
+    x = w.innerWidth || e.clientWidth || g.clientWidth;
+    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-doChart("Rutaceae");
+    chart.attr("width", x).attr("height", y);
+}
+window.onresize = updateWindow;
+
+
+
 
  
    
