@@ -51,6 +51,7 @@ var rows, mapped;
 			$("#searchtype").val(rankString);
 			
 			console.log(rankString + ":" + query_label + ":" + mapped[query_label].guid);
+			$("#splash").hide();
 			
 			doChart(mapped[query_label].guid);
 						
@@ -70,7 +71,7 @@ function doChart(query, facet){
 		query = 'lsid:"' + query + '"';
 	}
 
-	url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=collector&callback={callback}&q=" + query;
+	url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=species&facets=collector&callback={callback}&flimit=80&q=" + query;
 		
 	d3.jsonp( url , function(json){	
 	//d3.json("taxon.json", function(json){
