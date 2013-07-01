@@ -93,22 +93,21 @@ function doChart(query, facet){
 				.attr("class", "node")
 				.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 		
-		node.attr("r", function(d) { return d.r });		
-				
 		node.append("svg:title")
-			.text(function(d) { return d.taxon + ": " + format(d.value); });
-		 
-		node.append("svg:circle")
+		.text(function(d) { return d.taxon + ": " + format(d.value); });
+
+		node.append("a").attr("xlink:href", function(d) { return buildURL(d.taxon, d.value); })	
+		.attr("r", function(d) { return d.r })		
+		.append("svg:circle")
 			.attr("r", function(d) { return d.r; })
 			.style("fill", function(d) { return d.children ? "#fff" : fill(d.taxon); });
 		 
 		node.append("svg:text")
 			.attr("text-anchor", "middle")
 			.attr("dy", ".3em")
-			.text(function(d) {  return d.taxon.substring(0, d.r/3); });
-			
-			console.log(node);
-			node.exit().remove();
+			.text(function(d) {  return d.taxon.substring(0, d.r/3); })
+		
+		node.exit().remove();
 		
 		
 	});
