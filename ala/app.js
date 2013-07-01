@@ -22,6 +22,14 @@ var chart = d3.select("svg")
     .attr("height", height)
     .attr("class", "bubble");
 
+var search_current = "";
+var search_facet = "species";
+
+var facets = ['genus', 'species', 'collector'];
+
+var facet_limit = 50;
+
+
 
 $(document).ready(function() {
 var rows, mapped;
@@ -52,8 +60,10 @@ var rows, mapped;
 			
 			console.log(rankString + ":" + query_label + ":" + mapped[query_label].guid);
 			$("#splash").hide();
+
+			search_current = rankString;
 			
-			doChart(mapped[query_label].guid);
+			doChart(mapped[query_label].guid, rankString);
 						
 			return query_label;			
 		}
@@ -65,13 +75,18 @@ var rows, mapped;
 
 function doChart(query, facet){
 
+	search_current = facet;
+
 	var url;
 
 	if( (/^urn:/i).test(query) ){
 		query = 'lsid:"' + query + '"';
 	}
+	else{
+		query = facet + ':"' + query + '"';
+	}
 
-	url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=species&facets=collector&callback={callback}&flimit=80&q=" + query;
+	url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=species&facets=collector&callback={callback}&flimit=" + facet_limit + "&q=" + query;
 		
 	d3.jsonp( url , function(json){	
 	//d3.json("taxon.json", function(json){
@@ -83,7 +98,25 @@ function doChart(query, facet){
 				.remove();
 		}
 
-		res = json.facetResults[0].fieldResult;	
+		// a bit of logic to show the lower ranks if we are faceting on taxon
+		switch(search_current){
+			case "family":
+				search_facet = "genus";
+				break;
+			case "genus":
+				search_facet = "species";
+		}
+
+		index = jQuery.inArray(search_facet, facets);
+		index = index >= 0 ? index : 0;
+
+		res = json.facetResults[index].fieldResult;	
+		current_facet = json.facetResults[index].fieldName;
+
+		//update the page title
+		jQuery("#queryTitle").html(json.queryTitle);
+		console.log(json.queryTitle);
+
 		stuff = clean(res);
 		console.log(stuff);
 		var node = chart.selectAll("g.node")
@@ -96,9 +129,9 @@ function doChart(query, facet){
 		node.append("svg:title")
 		.text(function(d) { return d.taxon + ": " + format(d.value); });
 
-		node.append("a").attr("xlink:href", function(d) { return buildURL(d.taxon, d.value); })	
-		.attr("r", function(d) { return d.r })		
-		.append("svg:circle")
+		//node.append("a").attr("xlink:href", function(d) { return buildURL(d.taxon, d.value); })	
+		//.attr("r", function(d) { return d.r })		
+		node.append("svg:circle")
 			.attr("r", function(d) { return d.r; })
 			.style("fill", function(d) { return d.children ? "#fff" : fill(d.taxon); });
 		 
@@ -106,6 +139,12 @@ function doChart(query, facet){
 			.attr("text-anchor", "middle")
 			.attr("dy", ".3em")
 			.text(function(d) {  return d.taxon.substring(0, d.r/3); })
+
+		//add interactions
+		node.on('click', function(d,i){
+			
+			doChart(d.taxon, current_facet);
+		});
 		
 		node.exit().remove();
 		
