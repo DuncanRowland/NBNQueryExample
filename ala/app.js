@@ -33,7 +33,12 @@ var fulldata;
 
 $(document).ready(function() {
 
+// set up some of the UI
 $("#waiting").hide();
+$("a.facet").addClass("disabled");
+$("a.facet").click(function(e) {
+    e.preventDefault();
+});
 
 var rows, mapped;
     $("#searchvalue").typeahead({
@@ -71,6 +76,9 @@ var rows, mapped;
 			$("#waiting").show();
 	
 			doChart(mapped[query_label].guid, rankString);
+			
+			//$("a.facet").removeClass("disabled");
+			//$("a[href='taxon']").addClass("btn-primary");
 						
 			return query_label;			
 		}
@@ -79,10 +87,13 @@ var rows, mapped;
 
     // add listener to buttons
     $("a.facet").on('click', function () {
-	f = $(this).attr('href');
-	console.log(f);
-	updateView(f);
-	return false;
+		f = $(this).attr('href');
+		//$("a.facet").removeClass("btn-primary");
+		//$(this).addClass("btn-primary");
+		
+		updateView(f);
+		
+		return false;
     });
 
 });
@@ -90,6 +101,8 @@ var rows, mapped;
 
 
 function doChart(query, facet){
+
+	console.log("doChart - query: " + query + ", facet: " + facet);
 
 	search_current = facet;
 
@@ -160,8 +173,13 @@ function doChart(query, facet){
 
 		//add interactions
 		node.on('click', function(d,i){
+			$("#searchvalue").val('');
+			$("a.facet").removeClass("btn-primary");
+			
+			$("#waiting").show();	
 			
 			doChart(d.taxon, current_facet);
+			$('a[href="taxon"]').addClass("btn-primary");
 		});
 		
 		node.exit().remove();
@@ -176,11 +194,22 @@ function doChart(query, facet){
 function updateView(view){
 // changes the chart view to something else
 
+	$("#waiting").show();
+	
+			// remove old nodes if there are some
+		var nodeStringLenth = d3.selectAll("g.node").toString().length; 
+		if ( nodeStringLenth > 0) {
+			d3.selectAll("g.node")
+				.remove();
+		}
+
       index = jQuery.inArray(view, facets);
       index = index >= 0 ? index : 0;
 
       res = fulldata.facetResults[index].fieldResult;
       current_facet = fulldata.facetResults[index].fieldName;
+	  
+	  //jQuery("#queryTitle").html(fulldata.queryTitle);
 
       stuff = clean(res);
       node = chart.selectAll("g.node")
@@ -209,6 +238,10 @@ function updateView(view){
 			
 			doChart(d.taxon, current_facet);
 		});
+		
+
+		
+		$("#waiting").hide();
 		
 
 

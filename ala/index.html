@@ -54,7 +54,7 @@
     </div>
 	
 	<div id="container" class="container-fluid">
-		<div id="queryTitle"></div>
+		<h1><div id="queryTitle" class=""></div></h1>
 		<div id="viz" class="span10">
 			<div id="splash" class="hero-unit">
 			  <h2>Visualising the ALA</h1>
@@ -74,12 +74,12 @@
 		
 		<div id="facet" class="span2">
 			  <h4>Occurrences by:</h3>
-			  <a class="facet btn btn-primary btn-block" href="taxon">Taxon</a>
-			  <a class="facet btn btn-block" href="collector">Collector</a>
-			  <a class="facet btn btn-block" href="state">State</a>
-			  <a class="facet btn btn-block" href="year">Year</a>
-			  <a class="facet btn btn-block" href="endangered">Endangered Status</a>
-		
+			  <div data-toggle="buttons-radio">
+				<a class="facet btn btn-block" href="taxon">Taxon</a>
+				<a class="facet btn btn-block" href="collector">Collector</a>
+				<a class="facet btn btn-block" href="state">State</a>
+				<a class="facet btn btn-block" href="year">Year</a>
+			  </div>
 		</div>
 		<div class="navbar navbar-fixed-bottom" id="footer">
 			<p class="muted credit pull-right">Interface by <a href="http://twitter.com/peterneish">@peterneish</a>,
