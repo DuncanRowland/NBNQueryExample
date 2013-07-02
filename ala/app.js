@@ -193,6 +193,11 @@ function doChart(query, facet){
 function updateView(view){
 // changes the chart view to something else
 
+	//bork if there is nothing to update
+	if(search_current.length == 0){
+		return false;
+	}	
+
 	$("#waiting").show();
 	
 			// remove old nodes if there are some
