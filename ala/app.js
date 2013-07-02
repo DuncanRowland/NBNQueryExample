@@ -68,7 +68,7 @@ var rows, mapped;
 			var rankString = mapped[query_label].rankString;
 			$("#searchtype").val(rankString);
 			
-			console.log(rankString + ":" + query_label + ":" + mapped[query_label].guid);
+			//console.log(rankString + ":" + query_label + ":" + mapped[query_label].guid);
 			$("#splash").hide();
 
 			search_current = rankString;
@@ -102,7 +102,7 @@ var rows, mapped;
 
 function doChart(query, facet){
 
-	console.log("doChart - query: " + query + ", facet: " + facet);
+	//console.log("doChart - query: " + query + ", facet: " + facet);
 
 	search_current = facet;
 
@@ -146,10 +146,10 @@ function doChart(query, facet){
 
 		//update the page title
 		jQuery("#queryTitle").html(json.queryTitle);
-		console.log(json.queryTitle);
+		//console.log(json.queryTitle);
 
 		stuff = clean(res);
-		console.log(stuff);
+		//console.log(stuff);
 		var node = chart.selectAll("g.node")
 			.data(bubble.nodes(stuff));
 			
@@ -173,13 +173,12 @@ function doChart(query, facet){
 
 		//add interactions
 		node.on('click', function(d,i){
-			$("#searchvalue").val('');
-			$("a.facet").removeClass("btn-primary");
 			
-			$("#waiting").show();	
-			
+						
+			$("#waiting").show();				
 			doChart(d.taxon, current_facet);
-			$('a[href="taxon"]').addClass("btn-primary");
+			
+			
 		});
 		
 		node.exit().remove();
@@ -235,7 +234,7 @@ function updateView(view){
 
 		//add interactions
 		node.on('click', function(d,i){
-			
+			$("input#searchvalue").val('');
 			doChart(d.taxon, current_facet);
 		});
 		
