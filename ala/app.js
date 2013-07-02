@@ -25,19 +25,24 @@ var chart = d3.select("svg")
 var search_current = "";
 var search_facet = "species";
 
-var facets = ['genus', 'species', 'collector'];
+var facets = ['genus', 'species', 'collector', 'year', 'state'];
 
 var facet_limit = 50;
 
-
+var fulldata;
 
 $(document).ready(function() {
+
+$("#waiting").hide();
+
 var rows, mapped;
     $("#searchvalue").typeahead({
         minLength: 3,
 		items: 20,
         source: function(query, process) {
-            $.getJSON('http://bie.ala.org.au/search/auto.jsonp?callback=?', { q: query, limit: 100, idxType: "TAXON", geoOnly: "true"}, function(data) {
+            $.getJSON('http://bie.ala.org.au/search/auto.jsonp?callback=?',
+		      { q: query, limit: 100, idxType: "TAXON", geoOnly: "true"}, 
+		      function(data) {
 			
 				rows = new Array();
 				mapped = {};
@@ -51,8 +56,8 @@ var rows, mapped;
 				//for(var i=0; i<data.length; i++){
 				//	rows[i] = data[i].matchedNames[0];
 				//}
-                process(rows);
-            });
+                		process(rows);
+            		});
         },
 		updater: function(query_label){
 			var rankString = mapped[query_label].rankString;
@@ -63,10 +68,21 @@ var rows, mapped;
 
 			search_current = rankString;
 			
+			$("#waiting").show();
+	
 			doChart(mapped[query_label].guid, rankString);
 						
 			return query_label;			
 		}
+    });
+
+
+    // add listener to buttons
+    $("a.facet").on('click', function () {
+	f = $(this).attr('href');
+	console.log(f);
+	updateView(f);
+	return false;
     });
 
 });
@@ -86,11 +102,13 @@ function doChart(query, facet){
 		query = facet + ':"' + query + '"';
 	}
 
-	url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=species&facets=collector&callback={callback}&flimit=" + facet_limit + "&q=" + query;
+	url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=species&facets=collector&facets=year&facets=state&callback={callback}&flimit=" + facet_limit + "&q=" + query;
 		
 	d3.jsonp( url , function(json){	
 	//d3.json("taxon.json", function(json){
 		
+		fulldata = json;		
+	
 		// remove old nodes if there are some
 		var nodeStringLenth = d3.selectAll("g.node").toString().length; 
 		if ( nodeStringLenth > 0) {
@@ -148,7 +166,7 @@ function doChart(query, facet){
 		
 		node.exit().remove();
 		
-		
+		$("#waiting").hide();		
 	});
 	
 	
@@ -157,6 +175,42 @@ function doChart(query, facet){
 
 function updateView(view){
 // changes the chart view to something else
+
+      index = jQuery.inArray(view, facets);
+      index = index >= 0 ? index : 0;
+
+      res = fulldata.facetResults[index].fieldResult;
+      current_facet = fulldata.facetResults[index].fieldName;
+
+      stuff = clean(res);
+      node = chart.selectAll("g.node")
+                 .data(bubble.nodes(stuff));
+
+		node.enter().append("svg:g")
+				.attr("class", "node")
+				.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+		
+		node.append("svg:title")
+		.text(function(d) { return d.taxon + ": " + format(d.value); });
+
+		//node.append("a").attr("xlink:href", function(d) { return buildURL(d.taxon, d.value); })	
+		//.attr("r", function(d) { return d.r })		
+		node.append("svg:circle")
+			.attr("r", function(d) { return d.r; })
+			.style("fill", function(d) { return d.children ? "#fff" : fill(d.taxon); });
+		 
+		node.append("svg:text")
+			.attr("text-anchor", "middle")
+			.attr("dy", ".3em")
+			.text(function(d) {  return d.taxon.substring(0, d.r/3); })
+
+		//add interactions
+		node.on('click', function(d,i){
+			
+			doChart(d.taxon, current_facet);
+		});
+		
+
 
 }
 function clean(result){
@@ -188,8 +242,3 @@ function buildURL(tax, other){
 }
 
 
-
-
-
- 
-   

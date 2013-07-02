@@ -26,9 +26,9 @@
     <!-- Fav and touch icons -->
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="./bootstrap/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="./bootstrap/ico/apple-touch-icon-114-precomposed.png">
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="./bootstrap/ico/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href="./bootstrap/ico/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="./bootstrap/ico/favicon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="./bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="./bootstrap/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="./bootstrap/ico/favicon.png">
   </head>
 
   <body>
@@ -47,9 +47,8 @@
 			<input type="text" id="searchvalue" class="search-query" placeholder="search for a name" autocomplete="off">
 			<input type="hidden" id="searchtype" value="*">
 		  </form>
-
+	 
           </div><!--/.nav-collapse -->
-
         </div>
       </div>
     </div>
@@ -67,18 +66,19 @@
 				   (something like <em>Eucalyptus</em> or <em>Macropus</em> works well).
 				</p>
 			</div>
+		
+			<div id="waiting" class="span-10 text-center"><img src="img/ajax-loader.gif" /></div>
 			
 			<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="500"></svg>
 		</div>
 		
 		<div id="facet" class="span2">
 			  <h4>Occurrences by:</h3>
-			  <a class="facet btn btn-primary btn-block" href="">Genus</a>
-			  <a class="facet btn btn-block" href="">Species</a>
-			  <a class="facet btn btn-block" href="">Collector</a>
-			  <a class="facet btn btn-block" href="">State</a>
-			  <a class="facet btn btn-block" href="">Decade</a>
-			  <a class="facet btn btn-block" href="">Endangered Status</a>
+			  <a class="facet btn btn-primary btn-block" href="taxon">Taxon</a>
+			  <a class="facet btn btn-block" href="collector">Collector</a>
+			  <a class="facet btn btn-block" href="state">State</a>
+			  <a class="facet btn btn-block" href="year">Year</a>
+			  <a class="facet btn btn-block" href="endangered">Endangered Status</a>
 		
 		</div>
 		<div class="navbar navbar-fixed-bottom" id="footer">
@@ -92,16 +92,11 @@
 
 	
 
-			 
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-				<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
-				<script src="bootstrap/js/bootstrap.min.js"></script>
-			    <script src="http://d3js.org/d3.v3.min.js"></script>
-				<script src="jsonp.js"></script>
-				<script src="app.js"></script>
+	<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
+	<script src="bootstrap/js/bootstrap.min.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="jsonp.js"></script>
+	<script src="app.js"></script>
 
   </body>
 </html>
