@@ -86,8 +86,8 @@ var rows, mapped;
 
 
     // add listener to buttons
-    $("a.facet").on('click', function () {
-		f = $(this).attr('href');
+    $("button.facet").on('click', function () {
+		f = $(this).attr('value').toLowerCase();
 		//$("a.facet").removeClass("btn-primary");
 		//$(this).addClass("btn-primary");
 		
