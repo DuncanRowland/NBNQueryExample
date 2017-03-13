@@ -113,10 +113,12 @@ function doChart(query, facet){
 
         //DUNCAN - Hack to change query field
         if( (/^NHMSYS*/i).test(query) ){
-           if(facet=='species'){facet = 'species_guid';}
-        }
-        if( (/^NBNSYS*/i).test(query) ){
            if(facet=='genus'){facet = 'genus_guid';}
+      else if(facet=='species'){facet = 'species_guid';}
+        }
+  else  if( (/^NBNSYS*/i).test(query) ){
+           if(facet=='genus'){facet = 'genus_guid';}
+      else if(facet=='species'){facet = 'species_guid';}
         }
         ////
 
