@@ -1,5 +1,3 @@
-DUNCAN: I am adapting this for NBN Atlas UK Demo
+## NBN Atlas Query Example
 
-## D3 Sandbox
-
-This is where I will tinker with some [D3](http://d3js.org) stuff.
+Adapted version of Peter Neish's original visualisation.
