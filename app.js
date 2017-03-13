@@ -45,7 +45,10 @@ var rows, mapped;
         minLength: 3,
 		items: 20,
         source: function(query, process) {
-            $.getJSON('http://bie.ala.org.au/search/auto.jsonp?callback=?',
+            //DUNCAN - changed url to nbnatlas
+            //$.getJSON('http://bie.ala.org.au/search/auto.jsonp?callback=?',
+            ////
+            $.getJSON('https://species-ws.nbnatlas.org/search/auto.jsonp?callback=?',
 		      { q: query, limit: 100, idxType: "TAXON", geoOnly: "true"}, 
 		      function(data) {
 			
@@ -108,6 +111,15 @@ function doChart(query, facet){
 
 	var url;
 
+        //DUNCAN - Hack to change query field
+        if( (/^NHMSYS*/i).test(query) ){
+           if(facet=='species'){facet = 'species_guid';}
+        }
+        if( (/^NBNSYS*/i).test(query) ){
+           if(facet=='genus'){facet = 'genus_guid';}
+        }
+        ////
+
 	if( (/^urn:/i).test(query) ){
 		query = 'lsid:"' + query + '"';
 	}
@@ -115,8 +127,11 @@ function doChart(query, facet){
 		query = facet + ':"' + query + '"';
 	}
 
-	url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=species&facets=collector&facets=year&facets=state&callback={callback}&flimit=" + facet_limit + "&q=" + query;
-		
+        //DUNCAN - changed url to nbnatlas and q->fq
+	//url = "http://biocache.ala.org.au/ws/occurrences/search.json?fsort=count&facets=genus&facets=species&facets=collector&facets=year&facets=state&callback={callback}&flimit=" + facet_limit + "&q=" + query;
+        ////
+        url = "https://records-ws.nbnatlas.org/occurrences/search.json?fsort=count&facets=genus&facets=species&facets=collector&facets=year&facets=class&callback={callback}&flimit="+facet_limit+"&q=*:*&fq="+query;
+
 	d3.jsonp( url , function(json){	
 	//d3.json("taxon.json", function(json){
 		
@@ -145,7 +160,10 @@ function doChart(query, facet){
 		current_facet = json.facetResults[index].fieldName;
 
 		//update the page title
-		jQuery("#queryTitle").html(json.queryTitle);
+                //DUNCAN - put query as title
+		//jQuery("#queryTitle").html(json.queryTitle);
+                ////
+                jQuery("#queryTitle").html(decodeURIComponent(json.query));
 		//console.log(json.queryTitle);
 
 		stuff = clean(res);
