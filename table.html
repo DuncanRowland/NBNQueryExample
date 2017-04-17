@@ -27,8 +27,7 @@ th, td {
 
 <script>
 $(document).ready(function(){
-var myUrl = "https://records-ws.nbnatlas.org/occurrences/search?q=*:*&fq=lsid:NHMSYS0000080159&sort=occurrence_date&dir=desc&pageSize=5"
-
+   var myUrl = "https://records-ws.nbnatlas.org/occurrences/search?q=*:*&fq=lsid:NHMSYS0000080159&sort=occurrence_date&dir=desc&pageSize=5"
     $.ajax({url: myUrl, success: function(results){
     for (i in results.occurrences) {
         var occurrence = results.occurrences[i];
