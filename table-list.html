@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<style>
+table, th, td {
+   border: 1px solid lightgray;
+   border-collapse: collapse;
+}
+th, td {
+   padding: 5px;
+   text-align: left;
+}
+</style>
+</head>
+<body>
+
+<h1>Amphibians</h1>
+<ul>
+   <li><a href="javascript:update_table('NHMSYS0000080159');">Bufo bufo</a></li>
+   <li><a href="javascript:update_table('NBNSYS0000005072');">Anguis fragilis</a></li>
+   <li><a href="javascript:update_table('NHMSYS0020194826');">Lissotriton</a></li>
+</ul>
+
+<h2>Five Most Recent Records: <span id='mySpan'></span></h2>
+
+<table id="myTable" style="width:50%;">
+   <tr>
+      <th>Date</th>
+      <th>Grid Reference</th>
+   </tr>
+</table>
+
+<script>
+function update_table(tvk) {
+   var myUrl = "https://records-ws.nbnatlas.org/occurrences/search?q=*:*&fq=lsid:"+tvk+"&sort=occurrence_date&dir=desc&pageSize=5"
+   $.ajax({url: myUrl, success: function(results){
+     $("#myTable").empty();
+      for (i in results.occurrences) {
+         var occurrence = results.occurrences[i];
+         var newRowHtml='<tr>';
+         newRowHtml=newRowHtml+'<td>'+(new Date(occurrence.eventDate)).toDateString()+'</td>';
+         newRowHtml=newRowHtml+'<td>'+occurrence.gridReference+'</td>';
+         newRowHtml=newRowHtml+'</tr>'
+         $('#myTable').append(newRowHtml);
+      }
+      $('#mySpan').text(tvk);
+   }});
+}
+
+</script>
+
+</body>
+</html>
